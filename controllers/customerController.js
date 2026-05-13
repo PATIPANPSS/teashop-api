@@ -34,3 +34,20 @@ exports.getAllCustomers = async (req, res) => {
     res.status(500).json({ error: "ดึงข้อมูลล้มเหลว" });
   }
 };
+
+exports.getCustomerById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [results] = await db
+      .promise()
+      .query("SELECT * FROM customers WHERE id = ?", [id]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "ไม่พบข้อมูลลูกค้าคนนี้" });
+    }
+    res.json(results[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "ดึงข้อมูล ID ล้มเหลว" });
+  }
+};
