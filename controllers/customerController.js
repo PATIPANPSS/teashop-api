@@ -51,3 +51,21 @@ exports.getCustomerById = async (req, res) => {
     res.status(500).json({ error: "ดึงข้อมูล ID ล้มเหลว" });
   }
 };
+
+exports.updateCustomer = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, phone } = req.body;
+    const [results] = await db
+      .promise()
+      .query("UPDATE customers SET name = ?, phone = ? WHERE id = ?", [name, phone, id]);
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "ไม่พบข้อมูลลูกค้าคนนี้" });
+    }
+    res.json({ message: "อัปเดตข้อมูลสำเร็จ", id, name, phone });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "อัปเดตข้อมูลล้มเหลว" });
+  }
+};
