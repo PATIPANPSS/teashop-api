@@ -3,6 +3,7 @@ const app = express();
 const db = require('./config/db');
 const drinkRoutes = require('./routes/drinkRoutes');
 const customerRoutes = require('./routes/customerRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 app.use(express.json());
 
@@ -16,6 +17,7 @@ app.use(function (req, res, next) {
 
 app.use('/api/drinks', drinkRoutes);
 app.use('/api/customers', customerRoutes);
+app.use('/api/orders', orderRoutes);
 
 app.listen(3000, function () {
   console.log("Server is running...");
