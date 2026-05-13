@@ -24,3 +24,13 @@ exports.registerCustomer = async (req, res) => {
     res.status(500).json({ error: "สมัครสมาชิกล้มเหลว" });
   }
 };
+
+exports.getAllCustomers = async (req, res) => {
+  try {
+    const [results] = await db.promise().query("SELECT * FROM customers");
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "ดึงข้อมูลล้มเหลว" });
+  }
+};
