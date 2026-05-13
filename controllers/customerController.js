@@ -3,6 +3,13 @@ const db = require("../config/db");
 exports.registerCustomer = async (req, res) => {
   const { name, phone } = req.body;
 
+  if (!name || !phone) {
+    return res.status(400).json({ message: "กรุณากรอกข้อมูลให้ครบถ้วน" });
+  }
+  if (phone.length != 10) {
+    return res.status(400).json({ message: "เบอร์โทรศัพท์ต้องมี 10 หลัก" });
+  }
+
   try {
     const [results] = await db
       .promise()
