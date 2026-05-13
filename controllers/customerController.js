@@ -58,7 +58,11 @@ exports.updateCustomer = async (req, res) => {
     const { name, phone } = req.body;
     const [results] = await db
       .promise()
-      .query("UPDATE customers SET name = ?, phone = ? WHERE id = ?", [name, phone, id]);
+      .query("UPDATE customers SET name = ?, phone = ? WHERE id = ?", [
+        name,
+        phone,
+        id,
+      ]);
 
     if (results.affectedRows === 0) {
       return res.status(404).json({ message: "ไม่พบข้อมูลลูกค้าคนนี้" });
@@ -67,5 +71,22 @@ exports.updateCustomer = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "อัปเดตข้อมูลล้มเหลว" });
+  }
+};
+
+exports.deleteCustomer = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [results] = await db
+      .promise()
+      .query("DELETE FROM customers WHERE id = ?", [id]);
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "ไม่พบข้อมูลลูกค้าคนนี้" });
+    }
+    res.json({ message: "ลบข้อมูลสำเร็จ", id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "ลบข้อมูลล้มเหลว" });
   }
 };
