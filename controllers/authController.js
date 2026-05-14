@@ -1,5 +1,6 @@
 const db = require("../config/db");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 exports.registerUser = async (req, res) => {
   const { username, password, name } = req.body;
@@ -46,12 +47,20 @@ exports.loginUser = async (req, res) => {
         .json({ message: "username หรือ password ไม่ถูกต้อง" });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "เข้าสู่ระบบสำเร็จ",
-        user: { id: user.id, username: user.username, name: user.name },
-      });
+    const token = jwt.sign(
+      {
+        id: user.id,
+        username: user.username,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+
+    res.status(200).json({
+      message: "เข้าสู่ระบบสำเร็จ",
+      token: token,
+      user: { id: user.id, username: user.username, name: user.name },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "เข้าระบบล้มเหลว" });
