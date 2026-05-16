@@ -9,6 +9,8 @@ const authRoutes = require('./routes/authRoutes');
 const upload = require('./middlewares/uploadMiddleware');
 const path = require('path');
 
+const port = process.env.PORT || 3000;
+
 app.use(express.json());
 
 app.use(function (req, res, next) {
@@ -41,6 +43,6 @@ app.post('/api/upload-test', upload.single('image'), (req, res) => {
   });
 });
 
-app.listen(3000, function () {
+app.listen(port, function () {
   console.log("Server is running...");
 });
