@@ -46,16 +46,27 @@ exports.getDrinksById = async (req, res) => {
 };
 
 exports.addDrink = async (req, res) => {
-  const newDrink = req.body;
+  const { name, price, quantity } = req.body;
+  let imageName = null;
+
+  if (req.file) {
+    imageName = req.file.filename;
+  }
+
   try {
     const [results] = await db
       .promise()
-      .query("INSERT INTO drinks (name, price, quantity) VALUES (?, ?, ?)", [
-        newDrink.name,
-        newDrink.price,
-        newDrink.quantity,
-      ]);
-    res.status(201).json({ message: "เพิ่มเมนูสำเร็จ", id: results.insertId });
+      .query(
+        "INSERT INTO drinks (name, price, quantity, image) VALUES (?, ?, ?, ?)",
+        [name, price, quantity, imageName]
+      );
+    res
+      .status(201)
+      .json({
+        message: "เพิ่มเมนูสำเร็จ",
+        id: results.insertId,
+        imageSaved: imageName
+      });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "เพิ่มข้อมูลล้มเหลว" });
