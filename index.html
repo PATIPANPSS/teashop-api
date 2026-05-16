@@ -45,12 +45,49 @@
         cursor: pointer;
         width: 100%;
       }
+      hr {
+        margin: 40px 0;
+        border: 1px solid #ddd;
+      }
     </style>
   </head>
   <body>
     <h1 style="text-align: center">เมนูเครื่องดื่มทั้งหมด</h1>
     <div class="menu-container" id="menu-list">
       <p>กำลังโหลดข้อมูล...</p>
+    </div>
+
+    <hr />
+    <h2 style="text-align: center">ประวัติยอดขาย</h2>
+
+    <div
+      style="
+        max-width: 800px;
+        border: 1px solid #333;
+        margin: auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      "
+    >
+      <table style="width: 100%; border-collapse: collapse; text-align: left">
+        <thead>
+          <tr style="border-bottom: 2px solid #ddd; background-color: #f8f9fa">
+            <th style="padding: 12px">เวลาที่ซื้อ</th>
+            <th style="padding: 12px">ชื่อเมนู</th>
+            <th style="padding: 12px">จำนวน</th>
+            <th style="padding: 12px">ยอดรวม</th>
+          </tr>
+        </thead>
+        <tbody id="sales-history">
+          <tr>
+            <td colspan="4" style="text-align: center; padding: 20px">
+              กำลังโหลดข้อมูล...
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <script>
@@ -104,6 +141,7 @@
             );
 
             fetchDrinks();
+            fetchHistory();
           } else {
             alert(`สั่งซื้อไม่สำเร็จ: ${result.message || result.error}`);
           }
@@ -111,7 +149,41 @@
           console.error("ระบบขัดข้อง:", error);
         }
       }
+
+      async function fetchHistory() {
+        try {
+          const response = await fetch(
+            `http://localhost:3000/api/drinks/sales/history`,
+          );
+          const result = await response.json();
+
+          const tableBody = document.getElementById("sales-history");
+          tableBody.innerHTML = "";
+
+          if (result.sales && result.sales.length > 0) {
+            result.sales.forEach((order) => {
+              const date = new Date(order.created_at).toLocaleString("th-TH");
+
+              const row = `
+                <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 12px;">${date}</td>
+                                <td style="padding: 12px; font-weight: bold;">${order.menu_name}</td>
+                                <td style="padding: 12px;">${order.amount}</td>
+                                <td style="padding: 12px; color: #27ae60; font-weight: bold;">฿${order.total_price}</td>
+                            </tr>
+              `;
+              tableBody.innerHTML += row;
+            });
+          } else {
+            tableBody.innerHTML =
+              '<tr><td colspan="4" style="text-align: center; padding: 20px;">ยังไม่มีประวัติการขายครับ</td></tr>';
+          }
+        } catch (error) {
+          console.error("ดึงข้อมูลล้มเหลว", error);
+        }
+      }
       fetchDrinks();
+      fetchHistory();
     </script>
   </body>
 </html>
