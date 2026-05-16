@@ -58,15 +58,13 @@ exports.addDrink = async (req, res) => {
       .promise()
       .query(
         "INSERT INTO drinks (name, price, quantity, image) VALUES (?, ?, ?, ?)",
-        [name, price, quantity, imageName]
+        [name, price, quantity, imageName],
       );
-    res
-      .status(201)
-      .json({
-        message: "เพิ่มเมนูสำเร็จ",
-        id: results.insertId,
-        imageSaved: imageName
-      });
+    res.status(201).json({
+      message: "เพิ่มเมนูสำเร็จ",
+      id: results.insertId,
+      imageSaved: imageName,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "เพิ่มข้อมูลล้มเหลว" });
@@ -154,10 +152,22 @@ exports.buyDrink = async (req, res) => {
 
 exports.getSalesHistory = async (req, res) => {
   try {
-    const sql = `SELECT orders.id AS order_id, drinks.name AS menu_name, orders.amount, orders.total_price, orders.created_at FROM orders JOIN drinks ON orders.drink_id = drinks.id ORDER BY orders.created_at DESC`;
+    const [results] = await db
+      .promise()
+      .query(
+        `SELECT orders.id AS order_id, drinks.name AS menu_name, orders.amount, orders.total_price, orders.created_at FROM orders JOIN drinks ON orders.drink_id = drinks.id ORDER BY orders.created_at DESC`,
+      );
 
-    const [results] = await db.promise().query(sql);
-    res.json(results);
+    if (results.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "ยังไม่มีประวัติการขายในระบบครับ" });
+    }
+    res.status(200).json({
+      message: "ดึงข้อมูลประวัติยอดขายสำเร็จ",
+      total_orders: results.length,
+      sales: results,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "ดึงประวัติการขายล้มเหลว" });
