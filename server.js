@@ -7,6 +7,7 @@ const customerRoutes = require('./routes/customerRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const authRoutes = require('./routes/authRoutes');
 const upload = require('./middlewares/uploadMiddleware');
+const path = require('path');
 
 app.use(express.json());
 
@@ -17,6 +18,8 @@ app.use(function (req, res, next) {
 
   next();
 });
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/drinks', drinkRoutes);
 app.use('/api/customers', customerRoutes);
