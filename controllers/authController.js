@@ -1,8 +1,15 @@
 const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { validationResult } = require("express-validator");
 
 exports.registerUser = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ error: errors.array() });
+  }
+
   const { username, password, name } = req.body;
 
   try {
@@ -51,6 +58,7 @@ exports.loginUser = async (req, res) => {
       {
         id: user.id,
         username: user.username,
+        role: user.role,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" },

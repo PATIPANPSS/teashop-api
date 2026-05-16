@@ -18,3 +18,13 @@ exports.verifyToken = (req, res, next) => {
     next();
   });
 };
+
+exports.isAdmin = (req, res, next) => {
+  if (req.user && req.user.role === "admin") {
+    next();
+  } else {
+    return res
+      .status(403)
+      .json({ message: "ฟังก์ชันนี้ใช้ได้แค่ (Admin) เท่านั้น" });
+  }
+};

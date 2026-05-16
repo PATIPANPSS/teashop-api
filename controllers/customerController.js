@@ -43,8 +43,8 @@ exports.getAllCustomers = async (req, res) => {
 };
 
 exports.getCustomerById = async (req, res) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
     const [results] = await db
       .promise()
       .query("SELECT * FROM customers WHERE id = ?", [id]);
@@ -60,8 +60,8 @@ exports.getCustomerById = async (req, res) => {
 };
 
 exports.updateCustomer = async (req, res) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
     const { name, phone } = req.body;
     const [results] = await db
       .promise()
@@ -82,8 +82,8 @@ exports.updateCustomer = async (req, res) => {
 };
 
 exports.deleteCustomer = async (req, res) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
     const [results] = await db
       .promise()
       .query("DELETE FROM customers WHERE id = ?", [id]);
@@ -93,6 +93,13 @@ exports.deleteCustomer = async (req, res) => {
     }
     res.json({ message: "ลบข้อมูลสำเร็จ", id });
   } catch (error) {
+    if (error.errno === 1451) {
+      return res.status(400).json({
+        message:
+          "ไม่สามารถลบลูกค้ารายนี้ได้ เนื่องจากยังมีประวัติการสั่งซื้ออยู่ในระบบ",
+      });
+    }
+
     console.error(error);
     res.status(500).json({ error: "ลบข้อมูลล้มเหลว" });
   }
